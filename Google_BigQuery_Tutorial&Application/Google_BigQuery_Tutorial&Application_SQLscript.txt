@@ -1,0 +1,156 @@
+1.Active user with most answer
+SELECT
+  pa.owner_user_id, u.display_name, u.reputation, u.location, u.up_votes, u.down_votes, COUNT(pa.id) AS answer_cnt
+FROM
+  [instant-keel-185814:Stackoverflow.posts_answers] pa
+JOIN
+  [instant-keel-185814:Stackoverflow.users] u
+ON pa.owner_user_id = u.id
+WHERE YEAR(pa.creation_date)==2017
+GROUP BY u.display_name, pa.owner_user_id, u.reputation, u.up_votes, u.down_votes, u.location
+ORDER BY answer_cnt DESC
+LIMIT 20; 
+
+2. Active user with most hadoop-related questions
+SELECT
+  pq.owner_user_id AS user_id, u.display_name, u.reputation, u.location, u.up_votes, u.down_votes, COUNT(pq.id) AS post_cnt
+FROM
+  [instant-keel-185814:Stackoverflow.posts_questions] pq
+JOIN
+  [instant-keel-185814:Stackoverflow.users] u
+ON pq.owner_user_id = u.id
+WHERE YEAR(pq.creation_date)==2017 AND pq.tags LIKE '%hadoop%'
+GROUP BY user_id,u.display_name, pq.owner_user_id, u.reputation, u.up_votes, u.down_votes, u.location
+ORDER BY post_cnt DESC
+LIMIT 20;
+
+3. Active user with most posts questions.
+SELECT
+  pq.owner_user_id AS userid,
+  u.display_name,
+  u.reputation,
+  u.location,
+  COUNT(pq.id) AS post_cnt
+FROM
+  [instant-keel-185814:Stackoverflow.posts_questions] pq
+JOIN
+  [instant-keel-185814:Stackoverflow.users] u
+ON
+  pq.owner_user_id = u.id
+WHERE
+  YEAR(pq.creation_date)==2017
+GROUP BY
+  userid, u.display_name, pq.owner_user_id, u.reputation,u.location
+ORDER BY
+  post_cnt DESC
+LIMIT 10;
+
+4. keytags posts questions count
+SELECT * FROM
+(SELECT 'SQL' AS tag, YEAR(creation_date) AS Year, MONTH(creation_date) AS Month, COUNT(id) AS post_cnt
+FROM Stackoverflow.posts_questions
+WHERE tags LIKE '%sql%' GROUP BY tag,Year,Month),
+(SELECT 'Hadoop' AS tag, YEAR(creation_date) AS Year, MONTH(creation_date) AS Month,COUNT(id) AS post_cnt
+FROM Stackoverflow.posts_questions
+WHERE tags LIKE '%hadoop%'GROUP BY tag,Year,Month),
+(SELECT 'MySQL' AS tag, YEAR(creation_date) AS Year, MONTH(creation_date) AS Month,COUNT(id) AS post_cnt
+FROM Stackoverflow.posts_questions
+WHERE tags LIKE '%mysql%'GROUP BY tag,Year,Month),
+(SELECT 'Hive' AS tag, YEAR(creation_date) AS Year, MONTH(creation_date) AS Month,COUNT(id) AS post_cnt
+FROM Stackoverflow.posts_questions
+WHERE tags LIKE '%hive%'GROUP BY tag,Year,Month),
+(SELECT 'NoSQL' AS tag, YEAR(creation_date) AS Year, MONTH(creation_date) AS Month,COUNT(id) AS post_cnt
+FROM Stackoverflow.posts_questions
+WHERE tags LIKE '%nosql%'GROUP BY tag,Year,Month),
+(SELECT 'AWS' AS tag, YEAR(creation_date) AS Year, MONTH(creation_date) AS Month,COUNT(id) AS post_cnt
+FROM Stackoverflow.posts_questions
+WHERE tags LIKE '%aws%' OR tags LIKE '%amazon-web-services%' GROUP BY tag,Year,Month),
+(SELECT 'HBase' AS tag, YEAR(creation_date) AS Year, MONTH(creation_date) AS Month,COUNT(id) AS post_cnt
+FROM Stackoverflow.posts_questions
+WHERE tags LIKE '%hbase%' GROUP BY tag,Year,Month),
+(SELECT 'Pig' AS tag, YEAR(creation_date) AS Year, MONTH(creation_date) AS Month,COUNT(id) AS post_cnt
+FROM Stackoverflow.posts_questions
+WHERE tags LIKE '%pig%' GROUP BY tag,Year,Month),
+(SELECT 'Oracle' AS tag, YEAR(creation_date) AS Year, MONTH(creation_date) AS Month,COUNT(id) AS post_cnt
+FROM Stackoverflow.posts_questions
+WHERE tags LIKE '%oracle%' GROUP BY tag,Year,Month),
+(SELECT 'SQL-Server' AS tag, YEAR(creation_date) AS Year, MONTH(creation_date) AS Month,COUNT(id) AS post_cnt
+FROM Stackoverflow.posts_questions
+WHERE tags LIKE '%sqlserver%' OR tags LIKE '%sql-server%' GROUP BY tag,Year,Month),
+(SELECT 'Impala' AS tag, YEAR(creation_date) AS Year, MONTH(creation_date) AS Month,COUNT(id) AS post_cnt
+FROM Stackoverflow.posts_questions
+WHERE tags LIKE '%impala%' GROUP BY tag,Year,Month),
+(SELECT 'Spark' AS tag, YEAR(creation_date) AS Year, MONTH(creation_date) AS Month,COUNT(id) AS post_cnt
+FROM Stackoverflow.posts_questions
+WHERE tags LIKE '%spark%' GROUP BY tag,Year,Month),
+(SELECT 'SQLite' AS tag, YEAR(creation_date) AS Year, MONTH(creation_date) AS Month,COUNT(id) AS post_cnt
+FROM Stackoverflow.posts_questions
+WHERE tags LIKE '%sqlite%' GROUP BY tag,Year,Month),
+(SELECT 'Access' AS tag, YEAR(creation_date) AS Year, MONTH(creation_date) AS Month,COUNT(id) AS post_cnt
+FROM Stackoverflow.posts_questions
+WHERE tags LIKE '%access%' GROUP BY tag,Year,Month),
+(SELECT 'Teradata' AS tag, YEAR(creation_date) AS Year, MONTH(creation_date) AS Month,COUNT(id) AS post_cnt
+FROM Stackoverflow.posts_questions
+WHERE tags LIKE '%teradata%' GROUP BY tag,Year,Month),
+(SELECT 'Google BigQuery' AS tag, YEAR(creation_date) AS Year, MONTH(creation_date) AS Month,COUNT(id) AS post_cnt
+FROM Stackoverflow.posts_questions
+WHERE tags LIKE '%bigquery%' GROUP BY tag,Year,Month),
+(SELECT 'Google Cloud' AS tag, YEAR(creation_date) AS Year, MONTH(creation_date) AS Month,COUNT(id) AS post_cnt
+FROM Stackoverflow.posts_questions
+WHERE tags LIKE '%googlecloud%' OR tags LIKE '%google cloud%' OR tags LIKE '%bigquery%' OR tags LIKE '%google%' GROUP BY tag,Year,Month),
+ORDER BY tag, Year,Month;
+
+5. posts question count by year month
+SELECT
+  YEAR(creation_date) AS Year,Month(creation_date) AS Month,
+  COUNT(id) AS posts_cnt
+FROM
+  [instant-keel-185814:Stackoverflow.posts_questions]
+GROUP BY
+  Year,Month
+ORDER BY
+  Year,Month;
+
+6. posts qeustion with highest favorite count
+SELECT
+  id,title,favorite_count
+FROM
+  [instant-keel-185814:Stackoverflow.posts_questions]
+WHERE
+  YEAR(creation_date)==2017 AND
+  tags LIKE '%hadoop%'
+ORDER BY
+  favorite_count DESC
+LIMIT 1;
+
+7. posts qeustion with highest view count
+SELECT
+id,title,view_count
+FROM
+  [instant-keel-185814:Stackoverflow.posts_questions]
+WHERE
+  YEAR(creation_date)==2017 AND
+  tags LIKE '%sql%'
+ORDER BY
+  view_count DESC
+LIMIT 1;
+
+8. user reputaion and upvotes and accepted answer count
+SELECT acc.userid, acc.name, acc.u.creation_date AS creation_date, acc.u.location AS location, acc.u.up_votes AS up_votes, 
+acc.u.reputation AS reputation, acc.acc_cnt AS accepted_cnt, a.a_cnt AS answer_cnt,  acc.acc_cnt/ a.a_cnt AS acc_rate
+FROM
+(SELECT pa.owner_user_id AS userid, u.display_name AS name, u.creation_date, u.location, u.up_votes, u.reputation, COUNT(pq.accepted_answer_id) AS acc_cnt
+FROM [instant-keel-185814:Stackoverflow.posts_questions] pq
+JOIN [instant-keel-185814:Stackoverflow.posts_answers] pa
+ON pq.accepted_answer_id = pa.id
+JOIN [instant-keel-185814:Stackoverflow.users] u
+ON pa.owner_user_id   = u.id
+GROUP BY userid, name, u.creation_date, u.location, u.up_votes, u.reputation
+ORDER BY acc_cnt DESC) acc
+JOIN
+(SELECT pa.owner_user_id AS userid, COUNT(pa.id) AS a_cnt
+FROM [instant-keel-185814:Stackoverflow.posts_answers] pa
+GROUP BY userid
+ORDER BY a_cnt DESC) a ON acc.userid=a.userid
+ORDER BY acc.acc_cnt DESC;
+
