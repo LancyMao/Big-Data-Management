@@ -1,0 +1,3 @@
+* linguist-vendored
+*.txt linguist-vendored=false
+*.txt linguist-language=SQL
