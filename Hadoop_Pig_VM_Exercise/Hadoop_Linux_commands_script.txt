@@ -1,0 +1,35 @@
+1.
+~/scripts/developer/training_setup_dev.sh
+hadoop fs -mkdir petexchange
+
+2.
+mysql --user=training --password=training
+mysql > CREATE DATABASE petsexchange
+
+mysql --user=training --password=training petsexchange < "/home/training/Downloads/petsexchange.out"
+
+ALTER TABLE posts DROP COLUMN body;
+
+sqoop import \
+--connect jdbc:mysql://localhost/petsexchange \
+--username training --password training \
+--fields-terminated-by '\t' \
+--warehouse-dir petexchange \
+--table posts
+
+3.
+hadoop fs -ls /petexchange/posts
+
+4.
+cd /home
+mkdir petexchange
+
+5.
+hadoop fs -cat $home/petexchange/posts/part-m-00000 | head -25 > petexchange/posts.tsv
+
+6.
+cd ~/petexchange
+ls -l
+gedit posts.tsv &
+
+
